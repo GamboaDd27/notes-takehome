@@ -5,20 +5,13 @@ This is a Django REST API for a note-taking application, featuring user registra
 ## Requirements
 
 - [Python 3.x](https://www.python.org/downloads/)
-- [Git](https://git-scm.com/downloads) (to clone the repository)
 
 ---
 
 ## Getting Started
 
-### 1. Clone the Repository
 
-```bash
-git clone https://github.com/your-username/your-repo.git
-cd your-repo
-```
-
-### 2. Create a Virtual Environment
+### 1. Create a Virtual Environment
 
 - **macOS/Linux:**
   ```bash
@@ -29,7 +22,7 @@ cd your-repo
   python -m venv venv
   ```
 
-### 3. Activate the Virtual Environment
+### 2. Activate the Virtual Environment
 
 - **macOS/Linux:**
   ```bash
@@ -46,7 +39,7 @@ cd your-repo
 
 Once activated, your terminal prompt should change to indicate you’re working within the virtual environment.
 
-### 4. Install Dependencies
+### 3. Install Dependencies
 
 In the **same terminal** (with the virtual environment activated):
 
@@ -54,9 +47,7 @@ In the **same terminal** (with the virtual environment activated):
 pip install -r requirements.txt
 ```
 
-*(If you don’t have a `requirements.txt`, install packages manually, e.g. `pip install django djangorestframework djangorestframework-simplejwt`.)*
-
-### 5. Apply Migrations
+### 4. Apply Migrations
 
 Create/update your local database tables:
 
@@ -64,7 +55,7 @@ Create/update your local database tables:
 python manage.py migrate
 ```
 
-### 6. (Optional) Create a Superuser
+### 5. (Optional) Create a Superuser
 
 If you want access to the Django admin panel (`/admin/`):
 
@@ -74,7 +65,7 @@ python manage.py createsuperuser
 
 Follow the prompts to set a username and password.
 
-### 7. Run the Development Server
+### 6. Run the Development Server
 
 ```bash
 python manage.py runserver
@@ -118,23 +109,3 @@ Assuming you set up your `urls.py` as described:
          Remove-Item -Recurse -Force .\venv
          ```
   3. Create it again (see Step 2 above).
-
----
-
-## Contributing
-
-1. Fork the repository  
-2. Create a new branch (`git checkout -b feature/my-feature`)  
-3. Make your changes and commit them (`git commit -m 'Add my feature'`)  
-4. Push to the branch (`git push origin feature/my-feature`)  
-5. Create a new Pull Request  
-
----
-
-## License
-
-Specify your project’s license here (MIT, Apache, etc.). If you’re unsure, you can use the [MIT License](https://choosealicense.com/licenses/mit/) or another license that best suits your needs.
-
----
-
-That’s it! With these steps, users on **macOS** or **Windows** will be able to set up your project quickly. Enjoy building and using your Note-Taking App!
