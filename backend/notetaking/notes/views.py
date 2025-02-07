@@ -1,36 +1,31 @@
-from django.shortcuts import render
-
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-)
-
-from rest_framework import viewsets, generics, permissions
+from rest_framework import viewsets, permissions, filters
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.generics import CreateAPIView
+from rest_framework.permissions import AllowAny
+from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 
-from .models import Category, Note
-from .serializers import (
-    UserSerializer, 
-    CategorySerializer, 
-    NoteSerializer
-)
+from .models import Note, Category
+from .serializers import UserSerializer, NoteSerializer, CategorySerializer
+from .permissions import IsOwner
 
 # --- User Registration View ---
-class UserCreateView(generics.CreateAPIView):
+class UserCreateView(CreateAPIView):
     """
-    Creates a new user.
+    API endpoint to register a new user.
     """
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [AllowAny]
 
 
 # --- Category ViewSet ---
 class CategoryViewSet(viewsets.ModelViewSet):
     """
-    ViewSet to handle categories (list, create, retrieve, update, delete).
+    API endpoint for managing categories.
+    - Anyone can list categories.
+    - Authenticated users can create/update/delete.
     """
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
@@ -40,20 +35,35 @@ class CategoryViewSet(viewsets.ModelViewSet):
 # --- Note ViewSet ---
 class NoteViewSet(viewsets.ModelViewSet):
     """
-    ViewSet for CRUD on notes.
+    API endpoint for user notes.
+    - Users can only see their own notes.
+    - Users can create, update, and delete their own notes.
+    - Filtering & search supported.
     """
-    queryset = Note.objects.all()
     serializer_class = NoteSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def perform_create(self, serializer):
-        """
-        Automatically set the user of the note to the logged-in user.
-        """
-        serializer.save(user=self.request.user)
+    permission_classes = [permissions.IsAuthenticated, IsOwner]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = ['category']
+    search_fields = ['title']
 
     def get_queryset(self):
-        """
-        Filter notes so users only see their own notes.
-        """
-        return self.queryset.filter(user=self.request.user)
+        """Ensure users only see their own notes."""
+        return Note.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        """Automatically assign the logged-in user to the note."""
+        serializer.save(user=self.request.user)
+
+    def update(self, request, *args, **kwargs):
+        """Ensure users can only update their own notes."""
+        note = get_object_or_404(Note, id=kwargs["pk"], user=request.user)
+        serializer = self.get_serializer(note, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    def destroy(self, request, *args, **kwargs):
+        """Ensure users can only delete their own notes."""
+        note = get_object_or_404(Note, id=kwargs["pk"], user=request.user)
+        note.delete()
+        return Response({"message": "Note deleted successfully"}, status=204)
