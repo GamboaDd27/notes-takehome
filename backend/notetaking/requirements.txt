@@ -3,6 +3,7 @@ Django>=4.2
 djangorestframework>=3.14
 djangorestframework-simplejwt>=5.3
 django-filter
+django-cors-headers
 
 # Development tools (optional)
 django-extensions>=3.2  # Extra management commands
