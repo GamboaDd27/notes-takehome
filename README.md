@@ -6,16 +6,7 @@ The repository contains **both the backend & frontend** in a monorepo format:
 ```
 /notes-app/
 │── backend/       # Django REST Framework API
-│   ├── manage.py  # Django management script
-│   ├── notes/     # Main Django app
-│   ├── users/     # Authentication logic
-│   └── README.md  # API usage guide
 │── frontend/      # Next.js TypeScript App
-│   ├── pages/     # Next.js routing system
-│   ├── components/ # UI components
-│   ├── context/   # Auth & state management
-│   └── README.md  # Frontend usage guide
-│── README.md      # General documentation
 ```
 
 ---
