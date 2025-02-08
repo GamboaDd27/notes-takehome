@@ -12,14 +12,24 @@ interface Note {
     id: number;
     title: string;
     body: string;
+    category: number;
     category_name: string;
     last_edit_time: string;
 }
+
+const categoryColors: Record<number, string> = {
+    1: "bg-blue-500",  // Random Thoughts
+    2: "bg-green-500", // School
+    3: "bg-purple-500", // Personal
+};
+
 
 export default function Dashboard() {
     const { token, logout } = useContext(AuthContext);
     const router = useRouter();
     const [notes, setNotes] = useState<Note[]>([]);
+    const [filteredNotes, setFilteredNotes] = useState<Note[]>([]);
+    const [selectedCategory, setSelectedCategory] = useState<number | "all">("all");
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -34,6 +44,7 @@ export default function Dashboard() {
             })
             .then((res) => {
                 setNotes(res.data);
+                setFilteredNotes(res.data);
                 setLoading(false);
             })
             .catch(() => {
@@ -41,18 +52,34 @@ export default function Dashboard() {
             });
     }, [token, router, logout]);
 
+    // Handle category selection from sidebar
+    const handleCategoryChange = (categoryId: number | "all") => {
+        setSelectedCategory(categoryId);
+        if (categoryId === "all") {
+            setFilteredNotes(notes);
+        } else {
+            setFilteredNotes(notes.filter((note) => note.category === categoryId));
+        }
+    };
+
     return (
         <div className="flex h-screen">
-            <Sidebar />
+            <Sidebar selectedCategory={selectedCategory} onSelectCategory={handleCategoryChange} />
+
+            {/* Main Content */}
             <div className="flex-1 p-6 relative">
                 <h1 className="text-3xl font-bold">Your Notes</h1>
+
+                {/* No notes placeholder */}
                 {loading ? (
                     <p className="mt-4">Loading...</p>
-                ) : notes.length === 0 ? (
-                    <p className="mt-4 text-gray-500">No notes yet. Click "New Note" to add one.</p>
+                ) : filteredNotes.length === 0 ? (
+                    <p className="mt-4 text-gray-500">No notes found in this category.</p>
                 ) : (
-                    <NoteList notes={notes} />
+                    <NoteList notes={filteredNotes} />
                 )}
+
+                {/* New Note Button */}
                 <NewNote onNoteCreated={(newNote) => setNotes([...notes, newNote])} />
             </div>
         </div>
